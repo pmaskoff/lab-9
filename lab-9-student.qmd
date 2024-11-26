@@ -18,7 +18,7 @@ execute:
 #| results: false
 library(tidyverse)
 library(knitr)
-
+library(gt)
 ```
 
 ## Random Babies Simulation
@@ -90,7 +90,21 @@ proportions <- enframed |>
 
 
 proportions |>
-  kable()
+  gt() |>
+    tab_header(
+    title = "Proportion of Simulations by Number of Correctly Returned Babies",
+    subtitle = "Based on 10,000 simulations"
+  ) |>
+  cols_label(
+    ncorrect_0 = "0 Correct",
+    ncorrect_1 = "1 Correct",
+    ncorrect_2 = "2 Correct",
+    ncorrect_4 = "4 Correct"
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  )
 ```
 
 **3. Now create a barplot showing the proportion of simulations where 0, 1, 2, 3, and 4 babies were given to their correct parent(s).** 
@@ -191,13 +205,35 @@ all_simulations <- grid |>
 ```{r}
 #| label: table-of-simulated Means
 
+r5 <- function(n) {
+  rounded <- round(n, 5)
+  return(rounded)
+}
+
 summaries <- all_simulations |> 
   group_by(n) |> 
-  summarize(mean_sim_mean = mean(simulated_means),
-            sd_sim_mean = sd(simulated_means),
-            min_sim_mean = min(simulated_means),
-            max_sim_mean = max(simulated_means),
+  summarize(mean_sim_mean = r5(mean(simulated_means)),
+            sd_sim_mean = r5(sd(simulated_means)),
+            min_sim_mean = r5(min(simulated_means)),
+            max_sim_mean = r5(max(simulated_means)),
             .groups = 'drop')
+
+summaries |>
+  gt() |>
+    tab_header(
+    title = "Means of Statistics Across Simulations",
+    subtitle = "Including means of means, standard deviations, minimums, and maximums"
+  ) |>
+  cols_label(
+    mean_sim_mean = "Mean",
+    sd_sim_mean = "SD",
+    min_sim_mean = "Minimum",
+    max_sim_mean = "Maximum",
+  ) |>
+  cols_align(
+    align = "center",
+    columns = everything()
+  )
 
 summaries |>
   kable()
